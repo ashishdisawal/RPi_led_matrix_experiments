@@ -3,6 +3,8 @@
 # Ashish Disawal
 # Inspired by http://ezzep.blogspot.in/2012/12/RaspberryPi-5x7LED.html
 
+# This program will only light 1 LED at a time. From row1, col1 to row7, col5
+
 #include GPIO and Timer Library 
 import RPi.GPIO as GPIO
 import time
