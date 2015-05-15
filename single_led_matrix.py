@@ -1,5 +1,7 @@
 #!/usr/bin/python
 # Single 5x7 LED Matrix with 12 GPIO pins connected to 12 pins on LED Matrix
+# Ashish Disawal
+# Inspired by http://ezzep.blogspot.in/2012/12/RaspberryPi-5x7LED.html
 
 #include GPIO and Timer Library 
 import RPi.GPIO as GPIO
@@ -27,6 +29,7 @@ class led57_object(object):
 			GPIO.output(i, GPIO.LOW)
 
 	def demo(self):
+		self.clear()
 		for j in self.ROWS:
 			GPIO.output(j, GPIO.HIGH)
 			for i in self.COLS:
@@ -34,6 +37,7 @@ class led57_object(object):
 				time.sleep(self.sleeptime)
 				GPIO.output(i, GPIO.LOW)
 			GPIO.output(j, GPIO.LOW)
+		self.clear()
 
 
 def main():
