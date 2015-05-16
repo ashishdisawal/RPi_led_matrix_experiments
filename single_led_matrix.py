@@ -7,45 +7,72 @@
 import RPi.GPIO as GPIO
 import time
 
-class led57_object(object):
-	def __init__(self):
-		#define Raspberry Pi GPIO number
-		self.sleeptime=0.25
-		self.COLS=range(14,19)
-		self.ROWS=range(2,9)
+LATCH = 11
+CLK = 12
+dataBit = 7
 
-		#Raspberry Pi GPIO initalization
-		GPIO.setmode( GPIO.BCM )
-		for i in self.COLS:
-			GPIO.setup(i, GPIO.OUT)
-		for i in self.ROWS:
-			GPIO.setup(i, GPIO.OUT)
+sleeptime = 0.005
+COLS=range(14,19)
 
-	def clear(self):
-		#set all GPIO output to LOW
-		for i in self.COLS:
+
+def pulseCLK():
+	GPIO.output(CLK, 1)
+	time.sleep(sleeptime)
+	GPIO.output(CLK, 0)
+	return
+
+def serLatch():
+	GPIO.output(LATCH, 1)
+	time.sleep(sleeptime)
+	GPIO.output(LATCH, 0)
+	return
+
+def clear():
+	for i in COLS:
+		GPIO.output(i, GPIO.LOW)
+
+def ssrWrite(value):
+	for x in range(0, 8):
+		temp = value & 0x80
+		if temp == 0x80:
+			GPIO.output(dataBit, 1)
+		else:
+			GPIO.output(dataBit, 0)
+		for i in COLS:
+			GPIO.output(i, GPIO.HIGH)
+			time.sleep(sleeptime)
 			GPIO.output(i, GPIO.LOW)
-		for i in self.ROWS:
-			GPIO.output(i, GPIO.LOW)
-
-	def demo(self):
-		self.clear()
-		for k in self.ROWS:
-			for i in self.COLS:
-				GPIO.output(i, GPIO.HIGH)
-				for j in self.ROWS:
-					GPIO.output(j, GPIO.HIGH)
-				GPIO.output(k, GPIO.LOW)
-				time.sleep(self.sleeptime)
-				self.clear()
-			time.sleep(self.sleeptime)
-		self.clear()
-
-
-def main():
-	ledobj=led57_object()
-	ledobj.demo()
+		pulseCLK()
+		value = value << 0x01
+	serLatch()
+	return value
 
 if __name__ == "__main__":
-	main()
+	GPIO.setmode( GPIO.BCM )
+	GPIO.setup(LATCH, GPIO.OUT)
+	GPIO.setup(CLK, GPIO.OUT)
+	GPIO.setup(dataBit, GPIO.OUT)
+	
+	GPIO.output(LATCH, GPIO.LOW)
+	GPIO.output(CLK, GPIO.LOW)
+	
+	for i in COLS:
+		GPIO.setup(i, GPIO.OUT)
+		GPIO.output(i, GPIO.LOW)
+	
+	count = 0
+	while count < 8:
+		temp = 1
+		for j in range(0,8):
+			print ssrWrite(temp)
+			temp = temp << 1
+			time.sleep(sleeptime)
+	
+		for j in range(0,8):
+			temp = temp >> 1
+			print ssrWrite(temp)
+			time.sleep(sleeptime)
+		count += 1
+	clear()
+
 
