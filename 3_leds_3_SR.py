@@ -8,9 +8,7 @@
 import RPi.GPIO as GPIO
 import time
 
-row_data = 17
-row_latch = 27
-row_clock = 4
+ROWS = [2, 3, 4, 17, 27, 22, 10]
 
 col_data_1 = 14
 col_latch_1 = 15
